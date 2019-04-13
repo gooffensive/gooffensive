@@ -1,3 +1,3 @@
-# gooffensive
+# GoOffensive
 
 Welcome!
