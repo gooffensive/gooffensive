@@ -6,6 +6,8 @@ import (
 	"os"
 	"syscall"
 
+	offensiveProcess "github.com/gooffensive/gooffensive/pkg/gooffensive/process"
+	offensiveToken "github.com/gooffensive/gooffensive/pkg/gooffensive/token"
 	"golang.org/x/sys/windows"
 )
 
@@ -28,13 +30,13 @@ func MiniDump(tempDir string, process string, inPid uint32) (procName string, pi
 	}
 
 	// Get the process PID or name
-	procName, pid, err = GetProcess(process, inPid)
+	procName, pid, err = offensiveProcess.GetProcess(process, inPid)
 	if err != nil {
 		return
 	}
 
 	// Get debug privs (required for dumping processes not owned by current user)
-	err = SePrivEnable("SeDebugPrivilege")
+	err = offensiveToken.SePrivEnable("SeDebugPrivilege")
 	if err != nil {
 		return
 	}
@@ -71,7 +73,7 @@ func MiniDump(tempDir string, process string, inPid uint32) (procName string, pi
 		);
 	*/
 	// Call Windows MiniDumpWriteDump API
-	r, _, _ := miniDump.Call(uintptr(hProc), uintptr(pid), f.Fd(), 3, 0, 0, 0)
+	r, _, lErr := miniDump.Call(uintptr(hProc), uintptr(pid), f.Fd(), 3, 0, 0, 0)
 
 	f.Close() //idk why this fixes the 'not same as on disk' issue, but it does
 
@@ -81,6 +83,8 @@ func MiniDump(tempDir string, process string, inPid uint32) (procName string, pi
 			f.Close()
 			return
 		}
+	} else {
+		err = lErr
 	}
 	return
 }

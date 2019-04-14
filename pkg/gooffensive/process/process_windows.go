@@ -1,14 +1,9 @@
-package gooffensive
+package process
 
 import (
 	"fmt"
 	"syscall"
 	"unsafe"
-)
-
-const (
-	// TH32CS_SNAPPROCESS is a Windows constant used with Windows API calls
-	TH32CS_SNAPPROCESS = 0x00000002
 )
 
 // GetProcess takes in a process name OR a process ID and returns a pointer to the process handle, the process name,
@@ -20,7 +15,7 @@ func GetProcess(name string, pid uint32) (string, uint32, error) {
 		return "", 0, fmt.Errorf("a process name OR process ID must be provided")
 	}
 
-	snapshotHandle, err := syscall.CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+	snapshotHandle, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPPROCESS, 0)
 	if snapshotHandle < 0 || err != nil {
 		return "", 0, fmt.Errorf("there was an error creating the snapshot:\r\n%s", err)
 	}
