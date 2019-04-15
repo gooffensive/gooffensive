@@ -30,7 +30,7 @@ func MiniDump(tempDir string, process string, inPid uint32) (procName string, pi
 	}
 
 	// Get the process PID or name
-	procName, pid, err = offensiveProcess.GetProcess(process, inPid)
+	proc, err = offensiveProcess.GetProcess(process, inPid)
 	if err != nil {
 		return
 	}
@@ -42,7 +42,7 @@ func MiniDump(tempDir string, process string, inPid uint32) (procName string, pi
 	}
 
 	// Get a handle to process
-	hProc, err := syscall.OpenProcess(0x1F0FFF, false, pid) //PROCESS_ALL_ACCESS := uint32(0x1F0FFF)
+	hProc, err := syscall.OpenProcess(0x1F0FFF, false, proc.Pid) //PROCESS_ALL_ACCESS := uint32(0x1F0FFF)
 	if err != nil {
 		return
 	}
