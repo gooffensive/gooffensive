@@ -5,7 +5,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/lesnuages/gooffensive/pkg/gooffensive/process"
+	"github.com/gooffensive/gooffensive/pkg/gooffensive/process"
 	"golang.org/x/sys/windows"
 )
 
