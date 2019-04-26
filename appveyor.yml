@@ -1,5 +1,7 @@
 clone_folder: c:\gopath\src\github.com\gooffensive\gooffensive
 
+build: off
+
 environment:
   GOPATH: c:\gopath
 
