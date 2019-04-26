@@ -35,6 +35,10 @@ func MiniDump(tempDir string, process string, inPid uint32) (procName string, pi
 		return
 	}
 
+	procName = proc.Executable
+
+	pid = proc.Pid
+
 	// Get debug privs (required for dumping processes not owned by current user)
 	err = offensiveToken.SePrivEnable("SeDebugPrivilege")
 	if err != nil {
@@ -73,7 +77,7 @@ func MiniDump(tempDir string, process string, inPid uint32) (procName string, pi
 		);
 	*/
 	// Call Windows MiniDumpWriteDump API
-	r, _, lErr := miniDump.Call(uintptr(hProc), uintptr(pid), f.Fd(), 3, 0, 0, 0)
+	r, _, lErr := miniDump.Call(uintptr(hProc), uintptr(proc.Pid), f.Fd(), 3, 0, 0, 0)
 
 	f.Close() //idk why this fixes the 'not same as on disk' issue, but it does
 

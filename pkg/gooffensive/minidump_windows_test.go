@@ -30,19 +30,22 @@ func TestMinidump(t *testing.T) {
 
 	// Check a minidump providing a pid with blank string works
 	proc, err := offensiveProcess.GetProcess("go.exe", 0)
+	if err != nil {
+		t.Fatal("could not get process details for go.exe", err)
+	}
 	procName, pid, byts, err = MiniDump("", "", proc.Pid)
 
 	if err != nil || len(byts) == 0 {
 		t.Error("Minidump using pid failed")
 	}
 
-	// Verify proc name matches
-	if procName != "go.exe" {
-		t.Error("Minidump proc name does not match: ", "go.exe", procName)
+	// Verify proc name and pid matches
+	if procName != "go.exe" || pid != proc.Pid {
+		t.Error("Minidump proc name or pid does not match: ", "go.exe", procName, proc.Pid, pid)
 	}
 
 	// Check a minidump with a valid pid but invalid string works (pid should take priority)
-	procName, pid, byts, err = MiniDump("", "notarealprocess.exe", pid)
+	procName, pid, byts, err = MiniDump("", "notarealprocess.exe", proc.Pid)
 	if err != nil || len(byts) == 0 {
 		t.Error("Minidump using valid pid and invalid proc name failed")
 	}
@@ -53,7 +56,7 @@ func TestMinidump(t *testing.T) {
 	}
 
 	// Check a minidump with a valid proc name, but invalid pid fails
-	procName, pid, byts, err = MiniDump("", "go.exe", 123456789)
+	procName, pid, byts, err = MiniDump("", "go.exe", 1)
 	if err == nil {
 		t.Error("Minidump dumped a process even though provided pid was invalid")
 	}

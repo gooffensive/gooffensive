@@ -2,6 +2,7 @@ package process
 
 import (
 	"fmt"
+	"strings"
 	"syscall"
 	"unsafe"
 )
@@ -26,10 +27,12 @@ func GetProcess(name string, pid uint32) (WindowsProcess, error) {
 		return p, err
 	}
 	for _, proc := range procs {
-		if pid > 0 && proc.Pid == pid {
-			return p, nil
+		if pid > 0 {
+			if proc.Pid == pid {
+				return proc, nil
+			}
 		} else if proc.Executable == name {
-			return p, nil
+			return proc, nil
 		}
 	}
 	return p, fmt.Errorf("could not find a procces with the supplied name \"%s\" or PID of \"%d\"", name, pid)
@@ -66,6 +69,9 @@ func GetProcesses() (procs []WindowsProcess, err error) {
 
 		err = syscall.Process32Next(snapshotHandle, &process)
 		if err != nil {
+			if strings.Compare(err.Error(), "There are no more files.") == 0 {
+				return procs, nil
+			}
 			break
 		}
 	}
